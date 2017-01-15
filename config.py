@@ -5,9 +5,9 @@ import json
 
 class Config:
     def __init__(self, path):
-        self.data = self.__parse(path)
+        self.data = self._parse(path)
 
-    def __parse(self, path):
+    def _parse(self, path):
         json_data = open(path).read()
         data = json.loads(json_data)
         for (key, value) in data.items():

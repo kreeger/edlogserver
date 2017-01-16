@@ -14,5 +14,23 @@ class Store:
     def _type_for(self, dict):
         switcher = {
             "fileheader": models.FileHeader,
+            "clearsavedgame": models.ClearSavedGame,
+            "newcommander": models.NewCommander,
+            "loadgame": models.LoadGame,
+            "progress": models.Progress,
+            "rank": models.Rank,
+            "docked": models.Docked,
+            "dockingcancelled": models.DockingCancelled,
+            "dockingdenied": models.DockingDenied,
+            "dockinggranted": models.DockingGranted,
+            "dockingrequested": models.DockingRequested,
+            "dockingtimeout": models.DockingTimeout,
+            "fsdjump": models.FSDJump,
+            "liftoff": models.Liftoff,
+            "location": models.Location,
+            "supercruiseentry": models.SupercruiseEntry,
+            "supercruiseexit": models.SupercruiseExit,
+            "touchdown": models.Touchdown,
+            "undocked": models.Undocked,
         }
         return switcher.get(dict["event"].lower(), models.Base)

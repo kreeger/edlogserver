@@ -11,5 +11,5 @@ if __name__ == '__main__':
     # Server.start(config)
     store = Store(Loader('./_journals', Parser))
     loaded = store.import_data()
-    header = loaded[0]
-    print(header)
+    obj = [l for l in loaded if l.event == "Docked"][0]
+    print(obj)

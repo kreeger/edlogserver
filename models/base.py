@@ -3,21 +3,23 @@
 import dateutil.parser
 
 
-class Base:
+class Base(object):
     def __init__(self, data):
-        for (key, value) in data.items():
-            setattr(self, "%s" % key, value)
-
-    @property
-    def timestamp(self):
-        return self._timestamp
-
-    @timestamp.setter
-    def timestamp(self, value):
-        self._timestamp = dateutil.parser.parse(value)
-
-    def event(self):
-        return self._event
+        if data.get("timestamp"):
+            self.timestamp = dateutil.parser.parse(data.get("timestamp"))
+        else:
+            self.timestamp = None
+        self.event = data.get("event")
 
     def __str__(self):
         return "%s %r" % (self.__class__.__name__, self.__dict__)
+
+
+class FileHeader(Base):
+    def __init__(self, data):
+        super(FileHeader, self).__init__(data)
+
+        self.part = data.get("part")
+        self.language = data.get("language")
+        self.game_version = data.get("gameversion")
+        self.build = data.get("build")

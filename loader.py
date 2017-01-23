@@ -1,15 +1,23 @@
-#!/usr/bin/env python
+"""Describes classes used to load up JSON files from disk and parse them."""
 
-import json
 from os import walk, path
 
 
 class Loader:
+    """Handles reading JSON files and parsing them with a given class."""
+
     def __init__(self, directory, parser_cls):
+        """
+        Init and return an instance of this class.
+
+        Takes a directory where log files are stored, and the name of a class
+        to use when parsing all of the log files.
+        """
         self._parser_cls = parser_cls
         self.filepaths = self._get_files(directory)
 
     def load(self):
+        """Execute a load-and-parse operation."""
         dicts = []
         for filepath in self.filepaths:
             parser = self._parser_cls(filepath)

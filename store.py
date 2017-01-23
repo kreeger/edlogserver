@@ -1,17 +1,25 @@
-#!/usr/bin/env python
+"""Handles all data storage needs for importing JSON models."""
 
 import models
 
 
 class Store:
+    """Handles all data storage needs for importing JSON models"""
+
     def __init__(self, loader):
         self.loader = loader
+        self.models = []
 
     def import_data(self):
-        self.models = [self._type_for(o)(o) for o in self.loader.load()]
+        """Imports all model data using the loader."""
+
+        self.models = [self.type_for(o)(o) for o in self.loader.load()]
         return self.models
 
-    def _type_for(self, dict):
+    @staticmethod
+    def type_for(data):
+        """Returns the class type to be used for a given event name."""
+
         switcher = {
             "fileheader": models.FileHeader,
             "clearsavedgame": models.ClearSavedGame,
@@ -33,4 +41,4 @@ class Store:
             "touchdown": models.Touchdown,
             "undocked": models.Undocked,
         }
-        return switcher.get(dict["event"].lower(), models.Base)
+        return switcher.get(data["event"].lower(), models.Base)

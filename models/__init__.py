@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+"""Contains all models."""
 
 from .base import *
 from .startup import *

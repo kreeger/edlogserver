@@ -1,10 +1,13 @@
-#!/usr/bin/env python
+"""WIP: Describe all available HTTP routes to access internal data."""
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 
 class Server(BaseHTTPRequestHandler):
+    """Responsible for serving responses to HTTP requests."""
+
     def do_GET(self):
+        """Insert docstring here."""
         self.send_response(200)
         self.send_header("Content-type", "text/html")
         self.end_headers()
@@ -16,6 +19,7 @@ class Server(BaseHTTPRequestHandler):
 
     @classmethod
     def start(cls, config):
+        """Insert docstring here."""
         print('Starting server...')
 
         # Server settings

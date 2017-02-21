@@ -1,9 +1,11 @@
 """Describes models used for explaining other events."""
 
-from .base import Base
+from .base import Base, BaseModel
+from .enums.crimes import Crime
+from .enums.ranks import CombatRank, ExplorationRank, TradeRank, CQCRank
 
 
-class ApproachSettlement(Base):
+class ApproachSettlement(BaseModel):
     """Logged when approaching a planetary settlement."""
 
     def __init__(self, data):
@@ -13,7 +15,7 @@ class ApproachSettlement(Base):
         self.name = data.get("Name")
 
 
-class CockpitBreached(Base):
+class CockpitBreached(BaseModel):
     """Logged when cockpit canopy is breached."""
 
     def __init__(self, data):
@@ -21,23 +23,21 @@ class CockpitBreached(Base):
         super(CockpitBreached, self).__init__(data)
 
 
-class CommitCrime(Base):
+class CommitCrime(BaseModel):
     """Logged when a crime is recorded against the player."""
 
     def __init__(self, data):
         """Initialize and return an instance with an API data dictionary."""
         super(CommitCrime, self).__init__(data)
 
-        self.crime_type = data.get("CrimeType")  # - see 11.6
+        self.crime_type = Crime(data.get("CrimeType"))
         self.faction = data.get("Faction")
-
-        # Optional parameters (depending on crime)
         self.victim = data.get("Victim")
         self.fine = data.get("Fine")
         self.bounty = data.get("Bounty")
 
 
-class Continued(Base):
+class Continued(BaseModel):
     """Logged when the journal file grows to 500k lines.
 
     When this happens, we write this event, close the file, and start a new
@@ -51,7 +51,7 @@ class Continued(Base):
         self.next_part_number = data.get("Part")
 
 
-class DatalinkScan(Base):
+class DatalinkScan(BaseModel):
     """Logged when scanning a data link."""
 
     def __init__(self, data):
@@ -61,7 +61,7 @@ class DatalinkScan(Base):
         self.message = data.get("Message")
 
 
-class DatalinkVoucher(Base):
+class DatalinkVoucher(BaseModel):
     """Logged when scanning a datalink generates a reward."""
 
     def __init__(self, data):
@@ -73,7 +73,7 @@ class DatalinkVoucher(Base):
         self.payee_faction = data.get("PayeeFaction")
 
 
-class DataScanned(Base):
+class DataScanned(BaseModel):
     """Logged when scanning some types of data links."""
 
     def __init__(self, data):
@@ -85,7 +85,7 @@ class DataScanned(Base):
         self.type = data.get("Type")
 
 
-class DockFighter(Base):
+class DockFighter(BaseModel):
     """Logged when docking a fighter back with the mothership."""
 
     def __init__(self, data):
@@ -93,7 +93,7 @@ class DockFighter(Base):
         super(DockFighter, self).__init__(data)
 
 
-class DockSRV(Base):
+class DockSRV(BaseModel):
     """Logged when docking an SRV with the ship."""
 
     def __init__(self, data):
@@ -101,7 +101,7 @@ class DockSRV(Base):
         super(DockSRV, self).__init__(data)
 
 
-class FuelScoop(Base):
+class FuelScoop(BaseModel):
     """Logged when scooping fuel from a star."""
 
     def __init__(self, data):
@@ -112,7 +112,7 @@ class FuelScoop(Base):
         self.total = data.get("Total")
 
 
-class JetConeBoost(Base):
+class JetConeBoost(BaseModel):
     """Logged when enough material has been collected for an FSD boost.
 
     These are collected from a solar jet code (at a white dwarf or neutron
@@ -126,7 +126,7 @@ class JetConeBoost(Base):
         self.boost_value = data.get("BoostValue")
 
 
-class JetConeDamage(Base):
+class JetConeDamage(BaseModel):
     """Logged when receiving damage from passing through a jet cone."""
 
     def __init__(self, data):
@@ -136,7 +136,7 @@ class JetConeDamage(Base):
         self.module = data.get("Module")
 
 
-class LaunchFighter(Base):
+class LaunchFighter(BaseModel):
     """Logged when launching a fighter."""
 
     def __init__(self, data):
@@ -147,7 +147,7 @@ class LaunchFighter(Base):
         self.player_controlled = data.get("PlayerControlled")
 
 
-class LaunchSRV(Base):
+class LaunchSRV(BaseModel):
     """Logged deploying the SRV from a ship onto planet surface."""
 
     def __init__(self, data):
@@ -157,20 +157,29 @@ class LaunchSRV(Base):
         self.loadout = data.get("Loadout")
 
 
-class Promotion(Base):
+class Promotion(BaseModel):
     """Logged when the player's rank increases."""
 
     def __init__(self, data):
         """Initialize and return an instance with an API data dictionary."""
         super(Promotion, self).__init__(data)
 
-        self.combat = data.get("Combat")
-        self.trade = data.get("Trade")
-        self.explore = data.get("Explore")
-        self.cqc = data.get("CQC")
+        self.combat = None
+        self.trade = None
+        self.explore = None
+        self.cqc = None
+
+        if "Combat" in data:
+            self.combat = CombatRank(data.get("Combat"))
+        if "Trade" in data:
+            self.trade = TradeRank(data.get("Trade"))
+        if "Explore" in data:
+            self.explore = ExplorationRank(data.get("Explore"))
+        if "CQC" in data:
+            self.cqc = CQCRank(data.get("CQC"))
 
 
-class RebootRepair(Base):
+class RebootRepair(BaseModel):
     """Logged when the 'reboot repair' function is used."""
 
     def __init__(self, data):
@@ -180,7 +189,7 @@ class RebootRepair(Base):
         self.modules = data.get("Modules")
 
 
-class ReceiveText(Base):
+class ReceiveText(BaseModel):
     """Logged when a text message is received from another player or NPC."""
 
     def __init__(self, data):
@@ -193,7 +202,7 @@ class ReceiveText(Base):
         self.channel = data.get("Channel")
 
 
-class Resurrect(Base):
+class Resurrect(BaseModel):
     """Logged when the player restarts after death."""
 
     def __init__(self, data):
@@ -205,7 +214,7 @@ class Resurrect(Base):
         self.bankrupt = data.get("Bankrupt")
 
 
-class SelfDestruct(Base):
+class SelfDestruct(BaseModel):
     """Logged when the 'self destruct' function is used."""
 
     def __init__(self, data):
@@ -213,7 +222,7 @@ class SelfDestruct(Base):
         super(SelfDestruct, self).__init__(data)
 
 
-class SendText(Base):
+class SendText(BaseModel):
     """Logged when a text message is sent to another player."""
 
     def __init__(self, data):
@@ -224,7 +233,7 @@ class SendText(Base):
         self.message = data.get("Message")
 
 
-class Synthesis(Base):
+class Synthesis(BaseModel):
     """Logged when synthesis is used to repair or rearm."""
 
     def __init__(self, data):
@@ -232,10 +241,22 @@ class Synthesis(Base):
         super(Synthesis, self).__init__(data)
 
         self.name = data.get("Name")
-        self.materials = data.get("Materials")  # name - key, quant - value
+        if "Materials" in data:
+            mats = data.get("Materials")
+            self.materials = [Synthesis.Material(d, mats[d]) for d in mats]
+
+    class Material(Base):
+        """Logged when synthesis is used to repair or rearm."""
+
+        def __init__(self, name, quantity):
+            """Initialize and return an instance with a name and quantity."""
+            super(Synthesis.Material, self).__init__()
+
+            self.name = name
+            self.quantity = quantity
 
 
-class USSDrop(Base):
+class USSDrop(BaseModel):
     """Logged when dropping from Supercruise at a USS."""
 
     def __init__(self, data):
@@ -246,7 +267,7 @@ class USSDrop(Base):
         self.threat_level = data.get("USSThreat")
 
 
-class VehicleSwitch(Base):
+class VehicleSwitch(BaseModel):
     """Logged when switching control between the main ship and a fighter."""
 
     def __init__(self, data):
@@ -256,7 +277,7 @@ class VehicleSwitch(Base):
         self.to_vehicle = data.get("To")
 
 
-class WingAdd(Base):
+class WingAdd(BaseModel):
     """Logged when another player has joined the wing."""
 
     def __init__(self, data):
@@ -266,7 +287,7 @@ class WingAdd(Base):
         self.name = data.get("Name")
 
 
-class WingJoin(Base):
+class WingJoin(BaseModel):
     """Logged when this player has joined a wing."""
 
     def __init__(self, data):
@@ -276,7 +297,7 @@ class WingJoin(Base):
         self.others = data.get("Others")
 
 
-class WingLeave(Base):
+class WingLeave(BaseModel):
     """Logged when this player has left a wing."""
 
     def __init__(self, data):

@@ -1,23 +1,33 @@
 """Describes combat models."""
 
-from .base import Base
+from .base import Base, BaseModel
+from .enums.ranks import CombatRank
 
 
-class Bounty(Base):
-    """Logged when a player is awarded a bounty for a kill.."""
+class Bounty(BaseModel):
+    """Logged when a player is awarded a bounty for a kill."""
 
     def __init__(self, data):
         """Initialize and return an instance with an API data dictionary."""
         super(Bounty, self).__init__(data)
 
-        # TODO: Parse these into Reward objects (faction, reward)
-        self.rewards = data.get("Rewards")
+        self.rewards = [Bounty.Reward(d) for d in data.get("Rewards", [])]
         self.victim_faction = data.get("VictimFaction")
         self.total_reward = data.get("TotalReward")
         self.shared_with_others = data.get("SharedWithOthers")
 
+    class Reward(Base):
+        """Logged as part of a bounty, describing faction and credits."""
 
-class _Bond(Base):
+        def __init__(self, data):
+            """Initialize and return an instance with a data dictionary."""
+            super(Bounty.Reward, self).__init__()
+
+            self.faction = data.get("Faction")
+            self.reward = data.get("Reward")
+
+
+class _Bond(BaseModel):
     """Logged when a an internal base class for a combat bond."""
 
     def __init__(self, data):
@@ -37,22 +47,32 @@ class CapShipBond(_Bond):
         super(CapShipBond, self).__init__(data)
 
 
-class Died(Base):
+class Killer(Base):
+    """Logged with a Died event, about who killed who."""
+
+    def __init__(self, data):
+        """Initialize and return an instance with an API data dictionary."""
+        super(Died, self).__init__(data)
+
+        self.name = data.get("Name") or data.get("KillerName")
+        self.ship = data.get("Ship") or data.get("KillerShip")
+        self.rank = data.get("Rank") or data.get("KillerRank")
+
+
+class Died(BaseModel):
     """Logged when a player was killed."""
 
     def __init__(self, data):
         """Initialize and return an instance with an API data dictionary."""
         super(Died, self).__init__(data)
 
-        self.killer_name = data.get("KillerName")
-        self.killer_ship = data.get("KillerShip")
-        self.killer_rank = data.get("KillerRank")
-
-        # Or, if killed by a wing. Name, Ship, Rank.
-        self.killers = data.get("Killers")
+        if "Killers" in data:
+            self.killers = [Killer(d) for d in data.get("Killers", [])]
+        else:
+            self.killers = [Killer(data)]
 
 
-class EscapeInterdiction(Base):
+class EscapeInterdiction(BaseModel):
     """Logged when a player has escaped interdiction."""
 
     def __init__(self, data):
@@ -71,7 +91,7 @@ class FactionKillBond(_Bond):
         super(FactionKillBond, self).__init__(data)
 
 
-class HeatDamage(Base):
+class HeatDamage(BaseModel):
     """Logged when a when taking damage due to overheating."""
 
     def __init__(self, data):
@@ -79,7 +99,7 @@ class HeatDamage(Base):
         super(HeatDamage, self).__init__(data)
 
 
-class HeatWarning(Base):
+class HeatWarning(BaseModel):
     """Logged when a when heat exceeds 100%."""
 
     def __init__(self, data):
@@ -87,7 +107,7 @@ class HeatWarning(Base):
         super(HeatWarning, self).__init__(data)
 
 
-class HullDamage(Base):
+class HullDamage(BaseModel):
     """Logged when a when hull health drops below a threshold (20% steps)."""
 
     def __init__(self, data):
@@ -97,7 +117,7 @@ class HullDamage(Base):
         self.health = data.get("Health")
 
 
-class Interdicted(Base):
+class Interdicted(BaseModel):
     """Logged when a player was interdicted by player or npc."""
 
     def __init__(self, data):
@@ -107,12 +127,13 @@ class Interdicted(Base):
         self.submitted = data.get("Submitted")
         self.interdictor = data.get("Interdictor")
         self.is_player = data.get("IsPlayer")
-        self.combat_rank = data.get("CombatRank")
         self.faction = data.get("Faction")
         self.power = data.get("Power")
+        if "CombatRank" in data:
+            self.combat_rank = CombatRank(data.get("CombatRank"))
 
 
-class Interdiction(Base):
+class Interdiction(BaseModel):
     """Logged when a player has attempted to interdict a player or npc."""
 
     def __init__(self, data):
@@ -122,12 +143,13 @@ class Interdiction(Base):
         self.success = data.get("Success")
         self.interdictor = data.get("Interdictor")
         self.is_player = data.get("IsPlayer")
-        self.combat_rank = data.get("CombatRank")
         self.faction = data.get("Faction")
         self.power = data.get("Power")
+        if "CombatRank" in data:
+            self.combat_rank = CombatRank(data.get("CombatRank"))
 
 
-class PVPKill(Base):
+class PVPKill(BaseModel):
     """Logged when a when this player has killed another player."""
 
     def __init__(self, data):
@@ -135,10 +157,11 @@ class PVPKill(Base):
         super(PVPKill, self).__init__(data)
 
         self.victim = data.get("Victim")
-        self.combat_rank = data.get("CombatRank")
+        if "CombatRank" in data:
+            self.combat_rank = CombatRank(data.get("CombatRank"))
 
 
-class ShieldState(Base):
+class ShieldState(BaseModel):
     """Logged when a when shields are disabled in combat, or recharged."""
 
     def __init__(self, data):

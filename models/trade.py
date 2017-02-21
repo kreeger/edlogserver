@@ -1,9 +1,9 @@
 """Describes trading models."""
 
-from .base import Base
+from .base import BaseModel
 
 
-class BuyTradeData(Base):
+class BuyTradeData(BaseModel):
     """Logged when buying trade data in the galaxy map."""
 
     def __init__(self, data):
@@ -14,7 +14,7 @@ class BuyTradeData(Base):
         self.cost = data.get("Cost")
 
 
-class CollectCargo(Base):
+class CollectCargo(BaseModel):
     """Logged when scooping cargo from space or planet surface."""
 
     def __init__(self, data):
@@ -25,7 +25,7 @@ class CollectCargo(Base):
         self.stolen = data.get("Stolen")
 
 
-class EjectCargo(Base):
+class EjectCargo(BaseModel):
     """Logged when cargo is ejected."""
 
     def __init__(self, data):
@@ -38,7 +38,7 @@ class EjectCargo(Base):
         self.powerplay_origin = data.get("PowerplayOrigin")
 
 
-class MarketBuy(Base):
+class MarketBuy(BaseModel):
     """Logged when purchasing goods in the market."""
 
     def __init__(self, data):
@@ -51,7 +51,7 @@ class MarketBuy(Base):
         self.total_cost = data.get("TotalCost")
 
 
-class MarketSell(Base):
+class MarketSell(BaseModel):
     """Logged when selling goods in the market."""
 
     def __init__(self, data):
@@ -68,7 +68,7 @@ class MarketSell(Base):
         self.black_market = data.get("BlackMarket")
 
 
-class MiningRefined(Base):
+class MiningRefined(BaseModel):
     """Logged when mining fragments are refined into a unit of cargo."""
 
     def __init__(self, data):

@@ -1,9 +1,11 @@
 """Describes models that are written to the logs upon startup."""
 
-from .base import Base
+from .base import BaseModel
+from .enums.ranks import CombatRank, TradeRank, ExplorationRank, CQCRank
+from .enums.ranks import FederationRank, EmpireRank
 
 
-class ClearSavedGame(Base):
+class ClearSavedGame(BaseModel):
     """Logged if you should ever reset your game."""
 
     def __init__(self, data):
@@ -13,7 +15,7 @@ class ClearSavedGame(Base):
         self.commander_name = data.get("Name")
 
 
-class NewCommander(Base):
+class NewCommander(BaseModel):
     """Logged when creating a new commander."""
 
     def __init__(self, data):
@@ -24,7 +26,7 @@ class NewCommander(Base):
         self.package = data.get("Package")
 
 
-class LoadGame(Base):
+class LoadGame(BaseModel):
     """Logged at startup, when loading from main menu into game."""
 
     def __init__(self, data):
@@ -41,8 +43,8 @@ class LoadGame(Base):
         self.start_landed = data.get("StartLanded")
 
 
-class Progress(Base):
-    """Logged at startup."""
+class Progress(BaseModel):
+    """Logged at startup with percentages to the next levels."""
 
     def __init__(self, data):
         """Initialize and return an instance with an API data dictionary."""
@@ -56,7 +58,7 @@ class Progress(Base):
         self.cqc = data.get("CQC")
 
 
-class Rank(Base):
+class Rank(BaseModel):
     """Logged at startup."""
 
     # TODO: Add true rank names
@@ -64,9 +66,9 @@ class Rank(Base):
         """Initialize and return an instance with an API data dictionary."""
         super(Rank, self).__init__(data)
 
-        self.combat = data.get("Combat")
-        self.trade = data.get("Trade")
-        self.explore = data.get("Explore")
-        self.empire = data.get("Empire")
-        self.federation = data.get("Federation")
-        self.cqc = data.get("CQC")
+        self.combat = CombatRank(data.get("Combat"))
+        self.trade = TradeRank(data.get("Trade"))
+        self.explore = ExplorationRank(data.get("Explore"))
+        self.empire = EmpireRank(data.get("Empire"))
+        self.federation = FederationRank(data.get("Federation"))
+        self.cqc = CQCRank(data.get("CQC"))

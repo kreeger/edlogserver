@@ -1,9 +1,11 @@
 """Describes travel models."""
 
-from .base import Base
+from .base import BaseModel
+from .enums.exploration import BodyType
+from enum import Enum
 
 
-class Docked(Base):
+class Docked(BaseModel):
     """Logged when landing at a space station, outpost, or settlement."""
 
     def __init__(self, data):
@@ -21,7 +23,7 @@ class Docked(Base):
         self.security = data.get("Security")
 
 
-class DockingCancelled(Base):
+class DockingCancelled(BaseModel):
     """Logged when the player cancels a docking request."""
 
     def __init__(self, data):
@@ -31,7 +33,7 @@ class DockingCancelled(Base):
         self.station_name = data.get("StationName")
 
 
-class DockingDenied(Base):
+class DockingDenied(BaseModel):
     """Logged when the station denies a docking request."""
 
     def __init__(self, data):
@@ -39,12 +41,24 @@ class DockingDenied(Base):
         super(DockingDenied, self).__init__(data)
 
         self.station_name = data.get("StationName")
-        self.reason = data.get("Reason")
-        # NoSpace, TooLarge, Hostile, Offences, Distance,
-        #   ActiveFighter, NoReason
+        if "Reason" in data:
+            self.reason = DockingDenied.Reason(data.get("Reason"))
+        else:
+            self.reason = None
+
+    class Reason(Enum):
+        """Logged when the station denies a docking request."""
+
+        NO_SPACE = "NoSpace"
+        TOO_LARGE = "TooLarge"
+        HOSTILE = "Hostile"
+        OFFENCES = "Offences"
+        DISTANCE = "Distance"
+        ACTIVE_FIGHTER = "ActiveFighter"
+        NO_REASON = "NoReason"
 
 
-class DockingGranted(Base):
+class DockingGranted(BaseModel):
     """Logged when a docking request is granted."""
 
     def __init__(self, data):
@@ -55,7 +69,7 @@ class DockingGranted(Base):
         self.landing_pad = data.get("LandingPad")
 
 
-class DockingRequested(Base):
+class DockingRequested(BaseModel):
     """Logged when the player requests docking at a station."""
 
     def __init__(self, data):
@@ -65,7 +79,7 @@ class DockingRequested(Base):
         self.station_name = data.get("StationName")
 
 
-class DockingTimeout(Base):
+class DockingTimeout(BaseModel):
     """Logged when a docking request has timed out."""
 
     def __init__(self, data):
@@ -75,7 +89,7 @@ class DockingTimeout(Base):
         self.station_name = data.get("StationName")
 
 
-class FSDJump(Base):
+class FSDJump(BaseModel):
     """Logged when jumping from one star system to another."""
 
     def __init__(self, data):
@@ -101,7 +115,7 @@ class FSDJump(Base):
         self.powerplay_state = data.get("PowerplayState")
 
 
-class Liftoff(Base):
+class Liftoff(BaseModel):
     """Logged when taking off from planet surface."""
 
     def __init__(self, data):
@@ -112,7 +126,7 @@ class Liftoff(Base):
         self.longitude = data.get("Longitude")
 
 
-class Location(Base):
+class Location(BaseModel):
     """Logged at startup, or when being resurrected at a station."""
 
     def __init__(self, data):
@@ -122,7 +136,10 @@ class Location(Base):
         self.star_system = data.get("StarSystem")
         self.star_position = data.get("StarPos")
         self.body = data.get("Body")
-        self.body_type = data.get("BodyType")
+        if "BodyType" in data and data.get("BodyType") != "Null":
+            self.body_type = BodyType(data.get("BodyType"))
+        else:
+            self.body_type = None
         self.docked = data.get("Docked")
         self.station_name = data.get("StationName")
         self.station_type = data.get("StationType")
@@ -138,7 +155,7 @@ class Location(Base):
         self.powerplay_state = data.get("PowerplayState")
 
 
-class SupercruiseEntry(Base):
+class SupercruiseEntry(BaseModel):
     """Logged when entering supercruise from normal space."""
 
     def __init__(self, data):
@@ -148,7 +165,7 @@ class SupercruiseEntry(Base):
         self.star_system = data.get("Starsystem")
 
 
-class SupercruiseExit(Base):
+class SupercruiseExit(BaseModel):
     """Logged when leaving supercruise for normal space."""
 
     def __init__(self, data):
@@ -157,10 +174,13 @@ class SupercruiseExit(Base):
 
         self.star_system = data.get("Starsystem")
         self.body = data.get("Body")
-        self.body_type = data.get("BodyType")
+        if "BodyType" in data and data.get("BodyType") != "Null":
+            self.body_type = BodyType(data.get("BodyType"))
+        else:
+            self.body_type = None
 
 
-class Touchdown(Base):
+class Touchdown(BaseModel):
     """Logged when landing on a planet surface."""
 
     def __init__(self, data):
@@ -171,7 +191,7 @@ class Touchdown(Base):
         self.longitude = data.get("Longitude")
 
 
-class Undocked(Base):
+class Undocked(BaseModel):
     """Logged upon liftoff from a station, outpost or settlement."""
 
     def __init__(self, data):

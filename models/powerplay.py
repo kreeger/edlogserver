@@ -1,9 +1,9 @@
 """Describe Powerplay models."""
 
-from .base import Base
+from .base import BaseModel
 
 
-class PowerplayCollect(Base):
+class PowerplayCollect(BaseModel):
     """Logged when collecting powerplay commodities for delivery."""
 
     def __init__(self, data):
@@ -15,7 +15,7 @@ class PowerplayCollect(Base):
         self.count = data.get("Count")
 
 
-class PowerplayDefect(Base):
+class PowerplayDefect(BaseModel):
     """Logged when a player defects from one power to another."""
 
     def __init__(self, data):
@@ -26,7 +26,7 @@ class PowerplayDefect(Base):
         self.to_power = data.get("ToPower")
 
 
-class PowerplayDeliver(Base):
+class PowerplayDeliver(BaseModel):
     """Logged when delivering powerplay commodities."""
 
     def __init__(self, data):
@@ -38,7 +38,7 @@ class PowerplayDeliver(Base):
         self.count = data.get("Count")
 
 
-class PowerplayFastTrack(Base):
+class PowerplayFastTrack(BaseModel):
     """Logged when paying to fast-track allocation of commodities."""
 
     def __init__(self, data):
@@ -49,7 +49,7 @@ class PowerplayFastTrack(Base):
         self.cost = data.get("Cost")
 
 
-class PowerplayJoin(Base):
+class PowerplayJoin(BaseModel):
     """Logged when joining up with a power."""
 
     def __init__(self, data):
@@ -59,7 +59,7 @@ class PowerplayJoin(Base):
         self.power = data.get("Power")
 
 
-class PowerplayLeave(Base):
+class PowerplayLeave(BaseModel):
     """Logged when leaving a power."""
 
     def __init__(self, data):
@@ -69,7 +69,7 @@ class PowerplayLeave(Base):
         self.power = data.get("Power")
 
 
-class PowerplaySalary(Base):
+class PowerplaySalary(BaseModel):
     """Logged when receiving salary payment from a power."""
 
     def __init__(self, data):
@@ -80,7 +80,7 @@ class PowerplaySalary(Base):
         self.amount = data.get("Amount")
 
 
-class PowerplayVote(Base):
+class PowerplayVote(BaseModel):
     """Logged when voting for a system expansion."""
 
     def __init__(self, data):
@@ -92,7 +92,7 @@ class PowerplayVote(Base):
         self.system = data.get("System")
 
 
-class PowerplayVoucher(Base):
+class PowerplayVoucher(BaseModel):
     """Logged when receiving payment for powerplay combat."""
 
     def __init__(self, data):

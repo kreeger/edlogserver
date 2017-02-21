@@ -1,9 +1,10 @@
 """Describes station services models."""
 
-from .base import Base
+from .base import BaseModel
+from enum import Enum
 
 
-class BuyAmmo(Base):
+class BuyAmmo(BaseModel):
     """Logged when purchasing ammunition."""
 
     def __init__(self, data):
@@ -13,7 +14,7 @@ class BuyAmmo(Base):
         self.cost = data.get("Cost")
 
 
-class BuyDrones(Base):
+class BuyDrones(BaseModel):
     """Logged when purchasing drones."""
 
     def __init__(self, data):
@@ -26,7 +27,7 @@ class BuyDrones(Base):
         self.total_cost = data.get("TotalCost")
 
 
-class CommunityGoalDiscard(Base):
+class CommunityGoalDiscard(BaseModel):
     """Logged when opting out of a community goal."""
 
     def __init__(self, data):
@@ -37,7 +38,7 @@ class CommunityGoalDiscard(Base):
         self.system = data.get("System")
 
 
-class CommunityGoalJoin(Base):
+class CommunityGoalJoin(BaseModel):
     """Logged when signing up to a community goal."""
 
     def __init__(self, data):
@@ -48,7 +49,7 @@ class CommunityGoalJoin(Base):
         self.system = data.get("System")
 
 
-class CommunityGoalReward(Base):
+class CommunityGoalReward(BaseModel):
     """Logged when receiving a reward for a community goal."""
 
     def __init__(self, data):
@@ -60,7 +61,7 @@ class CommunityGoalReward(Base):
         self.reward = data.get("Reward")
 
 
-class CrewAssign(Base):
+class CrewAssign(BaseModel):
     """Logged when changing the task assignment of a member of crew."""
 
     def __init__(self, data):
@@ -71,7 +72,7 @@ class CrewAssign(Base):
         self.role = data.get("Role")
 
 
-class CrewFire(Base):
+class CrewFire(BaseModel):
     """Logged when dismissing a member of crew."""
 
     def __init__(self, data):
@@ -81,7 +82,7 @@ class CrewFire(Base):
         self.name = data.get("Name")
 
 
-class CrewHire(Base):
+class CrewHire(BaseModel):
     """Logged when engaging a new member of crew."""
 
     def __init__(self, data):
@@ -94,7 +95,7 @@ class CrewHire(Base):
         self.combat_rank = data.get("CombatRank")
 
 
-class EngineerApply(Base):
+class EngineerApply(BaseModel):
     """Logged when applying an engineer's upgrade to a module."""
 
     def __init__(self, data):
@@ -107,7 +108,7 @@ class EngineerApply(Base):
         self.override = data.get("Override")
 
 
-class EngineerCraft(Base):
+class EngineerCraft(BaseModel):
     """Logged when requesting an engineer upgrade."""
 
     def __init__(self, data):
@@ -120,7 +121,7 @@ class EngineerCraft(Base):
         self.ingredients = data.get("Ingredients")
 
 
-class EngineerProgress(Base):
+class EngineerProgress(BaseModel):
     """Logged when a player increases their access to an engineer."""
 
     def __init__(self, data):
@@ -128,11 +129,22 @@ class EngineerProgress(Base):
         super(EngineerProgress, self).__init__(data)
         self.engineer = data.get("Engineer")
         self.rank = data.get("Rank")
-        # Invited/Acquainted/Unlocked/Barred
-        self.progress = data.get("Progress")
+        if "Progress" in data:
+            self.progress = EngineerProgress.Progress(data.get("Progress"))
+        else:
+            self.progress = None
+
+    class Progress(Enum):
+        """Logged when a player increases their access to an engineer."""
+
+        KNOWN = "Known"
+        INVITED = "Invited"
+        ACQUAINTED = "Acquainted"
+        UNLOCKED = "Unlocked"
+        BARRED = "Barred"
 
 
-class FetchRemoteModule(Base):
+class FetchRemoteModule(BaseModel):
     """Logged when requesting a module from storage at another station."""
 
     def __init__(self, data):
@@ -147,7 +159,7 @@ class FetchRemoteModule(Base):
         self.shipId = data.get("ShipId")
 
 
-class MassModuleStore(Base):
+class MassModuleStore(BaseModel):
     """Logged when putting multiple modules into storage."""
 
     def __init__(self, data):
@@ -157,11 +169,10 @@ class MassModuleStore(Base):
         self.ship = data.get("Ship")
         self.ship_id = data.get("ShipId")
 
-        # TODO: Parse into MassModuleStoreItem instances
-        self.items = data.get("Items")
+        self.items = [MassModuleStoreItem(l) for l in data.get("Items")]
 
 
-class MassModuleStoreItem(Base):
+class MassModuleStoreItem(BaseModel):
     """An individual entry in a MassModuleStore record."""
 
     def __init__(self, data):
@@ -173,7 +184,7 @@ class MassModuleStoreItem(Base):
         self.engineer_modifications = data.get("EngineerModifications")
 
 
-class MissionAbandoned(Base):
+class MissionAbandoned(BaseModel):
     """Logged when a mission has been abandoned."""
 
     def __init__(self, data):
@@ -184,7 +195,7 @@ class MissionAbandoned(Base):
         self.mission_id = data.get("MissionID")
 
 
-class MissionAccepted(Base):
+class MissionAccepted(BaseModel):
     """Logged when starting a mission."""
 
     def __init__(self, data):
@@ -210,7 +221,7 @@ class MissionAccepted(Base):
         self.passenger_type = data.get("PassengerType")
 
 
-class MissionCompleted(Base):
+class MissionCompleted(BaseModel):
     """Logged when a mission is completed."""
 
     def __init__(self, data):
@@ -233,7 +244,7 @@ class MissionCompleted(Base):
         self.commodity_reward = data.get("CommodityReward")  # name, count
 
 
-class MissionFailed(Base):
+class MissionFailed(BaseModel):
     """Logged when a mission has failed."""
 
     def __init__(self, data):
@@ -244,7 +255,7 @@ class MissionFailed(Base):
         self.mission_id = data.get("MissionID")
 
 
-class ModuleBuy(Base):
+class ModuleBuy(BaseModel):
     """Logged when buying a module in outfitting."""
 
     def __init__(self, data):
@@ -261,7 +272,7 @@ class ModuleBuy(Base):
         self.sell_price = data.get("SellPrice")
 
 
-class ModuleRetrieve(Base):
+class ModuleRetrieve(BaseModel):
     """Logged when fetching a previously stored module."""
 
     def __init__(self, data):
@@ -270,14 +281,14 @@ class ModuleRetrieve(Base):
 
         self.slot = data.get("Slot")
         self.ship = data.get("Ship")
-        self.ship_id
+        self.ship_id = data.get("ShipID")
         self.retrieved_item = data.get("RetrievedItem")
         self.engineer_modifications = data.get("EngineerModifications")
         self.swap_out_item = data.get("SwapOutItem")
         self.cost = data.get("Cost")
 
 
-class ModuleSell(Base):
+class ModuleSell(BaseModel):
     """Logged when selling a module in outfitting."""
 
     def __init__(self, data):
@@ -291,7 +302,7 @@ class ModuleSell(Base):
         self.ship_id = data.get("ShipID")
 
 
-class ModuleSellRemote(Base):
+class ModuleSellRemote(BaseModel):
     """Logged when selling a module in storage at another station."""
 
     def __init__(self, data):
@@ -306,7 +317,7 @@ class ModuleSellRemote(Base):
         self.ship_id = data.get("ShipId")
 
 
-class ModuleStore(Base):
+class ModuleStore(BaseModel):
     """Logged when storing a module in Outfitting."""
 
     def __init__(self, data):
@@ -322,7 +333,7 @@ class ModuleStore(Base):
         self.cost = data.get("Cost")
 
 
-class ModuleSwap(Base):
+class ModuleSwap(BaseModel):
     """Logged when moving a module to a different slot on the ship."""
 
     def __init__(self, data):
@@ -337,7 +348,7 @@ class ModuleSwap(Base):
         self.ship_id = data.get("ShipID")
 
 
-class PayFines(Base):
+class PayFines(BaseModel):
     """Logged when paying fines."""
 
     def __init__(self, data):
@@ -348,7 +359,7 @@ class PayFines(Base):
         self.broker_percentage = data.get("BrokerPercentage")
 
 
-class PayLegacyFines(Base):
+class PayLegacyFines(BaseModel):
     """Logged when paying legacy fines."""
 
     def __init__(self, data):
@@ -359,7 +370,7 @@ class PayLegacyFines(Base):
         self.broker_percentage = data.get("BrokerPercentage")
 
 
-class RedeemVoucher(Base):
+class RedeemVoucher(BaseModel):
     """Logged when claiming payment for combat bounties and bonds."""
 
     def __init__(self, data):
@@ -371,7 +382,7 @@ class RedeemVoucher(Base):
         self.broker_percentage = data.get("BrokerPercentage")
 
 
-class RefuelAll(Base):
+class RefuelAll(BaseModel):
     """Logged when doing a full-tank refuel."""
 
     def __init__(self, data):
@@ -382,7 +393,7 @@ class RefuelAll(Base):
         self.amount = data.get("Amount")
 
 
-class RefuelPartial(Base):
+class RefuelPartial(BaseModel):
     """Logged when doing a partial tank refuel."""
 
     def __init__(self, data):
@@ -393,7 +404,7 @@ class RefuelPartial(Base):
         self.amount = data.get("Amount")
 
 
-class Repair(Base):
+class Repair(BaseModel):
     """Logged when repairing the ship."""
 
     def __init__(self, data):
@@ -404,7 +415,7 @@ class Repair(Base):
         self.cost = data.get("Cost")
 
 
-class RepairAll(Base):
+class RepairAll(BaseModel):
     """Logged when repairing everything."""
 
     def __init__(self, data):
@@ -414,7 +425,7 @@ class RepairAll(Base):
         self.cost = data.get("Cost")
 
 
-class RestockVehicle(Base):
+class RestockVehicle(BaseModel):
     """Logged when purchasing an SRV or Fighter."""
 
     def __init__(self, data):
@@ -427,7 +438,7 @@ class RestockVehicle(Base):
         self.count = data.get("Count")
 
 
-class ScientificResearch(Base):
+class ScientificResearch(BaseModel):
     """Logged when contributing materials to a "research" community goal."""
 
     def __init__(self, data):
@@ -439,7 +450,7 @@ class ScientificResearch(Base):
         self.count = data.get("Count")
 
 
-class SellDrones(Base):
+class SellDrones(BaseModel):
     """Logged when selling unwanted drones back to the market."""
 
     def __init__(self, data):
@@ -452,7 +463,7 @@ class SellDrones(Base):
         self.total_sale = data.get("TotalSale")
 
 
-class ShipyardBuy(Base):
+class ShipyardBuy(BaseModel):
     """Logged when buying a new ship in the shipyard.
 
     Note that the new ship's ShipID will be logged in a separate event after
@@ -472,7 +483,7 @@ class ShipyardBuy(Base):
         self.sell_price = data.get("SellPrice")
 
 
-class ShipyardNew(Base):
+class ShipyardNew(BaseModel):
     """Logged after a new ship has been purchased."""
 
     def __init__(self, data):
@@ -483,7 +494,7 @@ class ShipyardNew(Base):
         self.ship_id = data.get("ShipID")
 
 
-class ShipyardSell(Base):
+class ShipyardSell(BaseModel):
     """Logged when selling a ship stored in the shipyard."""
 
     def __init__(self, data):
@@ -496,7 +507,7 @@ class ShipyardSell(Base):
         self.system = data.get("System")
 
 
-class ShipyardTransfer(Base):
+class ShipyardTransfer(BaseModel):
     """Logged when requesting a ship be transported to this station."""
 
     def __init__(self, data):
@@ -510,7 +521,7 @@ class ShipyardTransfer(Base):
         self.transfer_price = data.get("TransferPrice")
 
 
-class ShipyardSwap(Base):
+class ShipyardSwap(BaseModel):
     """Logged when switching to another ship already stored at this station."""
 
     def __init__(self, data):

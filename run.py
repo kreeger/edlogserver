@@ -5,11 +5,11 @@
 from parser import JSONParser
 from loader import Loader
 from store import Store
+from models import SupercruiseExit
 
 if __name__ == '__main__':
     # config = Config('./config.json')
     # Server.start(config)
     store = Store(Loader('./_journals', JSONParser))
     loaded = store.import_data()
-    obj = [l for l in loaded if l.event == "FSDJump"][0]
-    print(obj)
+    [print(l.body_type) for l in loaded if isinstance(l, SupercruiseExit)]

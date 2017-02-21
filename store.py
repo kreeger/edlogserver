@@ -13,7 +13,13 @@ class Store:
 
     def import_data(self):
         """Import all model data using the loader."""
-        self.models = [self.type_for(o)(o) for o in self.loader.load()]
+        self.models = []
+        for o in self.loader.load():
+            klass = self.type_for(o)
+            if hasattr(klass, "from_api"):
+                self.models.append(klass.from_api(o))
+            else:
+                self.models.append(klass(o))
         return self.models
 
     @staticmethod
@@ -146,4 +152,4 @@ class Store:
             "WingJoin": models.WingJoin,
             "WingLeave": models.WingLeave,
         }
-        return switcher.get(data["event"], models.Base)
+        return switcher.get(data["event"], models.BaseModel)
